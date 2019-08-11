@@ -1,7 +1,7 @@
-var jsdom = require('jsdom');
+require('jsdom-global')()
 
 global.JS = require('jstest');
-global.emojify = require('../src/emojify.js');
+global.emojify = require('../distv2/index');
 
 require('./spec/dom');
 require('./spec/tag_type');
@@ -15,16 +15,7 @@ global.assertEmoji = function (test, rootEl, emojiTitles) {
     }
 };
 
-jsdom.env({
-    html: '<html><body></body></html>',
-    done: function(errors, win) {
-        global.window = win;
-        global.document = win.document;
-        JS.Test.autorun(function(runner){
-            runner.setReporter(new JS.Test.Reporters.Spec())
-            runner.addReporter(new JS.Test.Reporters.ExitStatus())
-        })
-    }
+JS.Test.autorun(function(runner){
+    runner.setReporter(new JS.Test.Reporters.Spec())
+    runner.addReporter(new JS.Test.Reporters.ExitStatus())
 })
-
-
