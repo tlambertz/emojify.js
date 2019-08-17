@@ -178,7 +178,7 @@ function bump (done) {
 }
 exports.bump = bump
 
-const compile = gulp.series(scripts, imageAndStyles)
+const compile = gulp.series(imageAndStyles, scripts)
 exports.default = compile
 exports.compile = compile
 exports.release = gulp.series(compile, bump)
