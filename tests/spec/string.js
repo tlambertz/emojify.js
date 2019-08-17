@@ -59,10 +59,10 @@ JS.Test.describe('emojify used with flat strings', function() {
     });
 
     this.describe('isolated cases', function() {
-        this.it(':neckbeard:', function() {
-            var text = ":neckbeard:";
+        this.it(':necktie:', function() {
+            var text = ":necktie:";
             var result = emojify.replace(text);
-            this.assertEqual('<img align=\'absmiddle\' alt=\':neckbeard:\' class=\'emoji\' src=\'images/emoji/neckbeard.png\' title=\':neckbeard:\' />', result);
+            this.assertEqual('<img align=\'absmiddle\' alt=\':necktie:\' class=\'emoji\' src=\'images/emoji/necktie.png\' title=\':necktie:\' />', result);
         });
 
         this.it('inserts a <3 heart', function() {
