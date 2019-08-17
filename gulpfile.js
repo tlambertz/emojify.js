@@ -23,7 +23,7 @@ const paths = {
         images: {
             root: imageRoot,
             separate: path.join(imageRoot, 'basic'),
-            sprites: path.join(imageRoot, 'sprites')
+            sprites: path.join(imageRoot, 'sprites'),
         }
     }
 }
@@ -67,15 +67,30 @@ var getEmoticonFilter = function(){
     })
 };
 
-var imageAndStyles = gulp.series(copyStyles, dataURI, function () {
-    return gulp.src('./v2/images/emoji/*.png')
-        .pipe(gulp.dest(paths.dist.images.separate))
+const imageAndStyles = gulp.series(copyStyles, dataURI, function () {
+    const emojiPath = paths.dist.images.separate
+    del(emojiPath);
+
+    const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => Object.assign(acc, {
+        [emoji.image]: emoji
+    }), {})
+    const availableFiles = Object.keys(emojiMap)
+
+    return gulp.src('node_modules/emoji-datasource-apple/img/apple/64/*.png')
+        .pipe($.filter(file => availableFiles.includes(file.basename)))
+        .pipe($.rename(file => {
+            const emojiData = emojiMap[`${file.basename}${file.extname}`]
+
+            file.basename = emojiData.short_name
+            file.dirname = './'
+        }))
+        .pipe(gulp.dest(emojiPath))
 })
 
 exports.imageAndStyles = imageAndStyles
 
 function dataURI () {
-    var emoticonFilter = getEmoticonFilter();
+    const emoticonFilter = getEmoticonFilter();
 
     return gulp.src('./src/images/emoji/*.png')
         .pipe($.imageDataUri({
@@ -144,29 +159,7 @@ function bump (done) {
 }
 exports.bump = bump
 
-function update () {
-    // TODO: this should be bundled in build stage
-    const emojiPath = `./v2/images/emoji`
-    del(emojiPath);
-
-    const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => Object.assign(acc, {
-        [emoji.image]: emoji
-    }), {})
-    const availableFiles = Object.keys(emojiMap)
-
-    return gulp.src('node_modules/emoji-datasource-apple/img/apple/64/*.png')
-        .pipe($.filter(file => availableFiles.includes(file.basename)))
-        .pipe($.rename(file => {
-            const emojiData = emojiMap[`${file.basename}${file.extname}`]
-
-            file.basename = emojiData.short_name
-            file.dirname = './'
-        }))
-        .pipe(gulp.dest(emojiPath))
-}
-exports.update = update
-
 const compile = gulp.series(scripts, imageAndStyles)
 exports.default = compile
 exports.compile = compile
-exports.release = gulp.series(update, compile, bump)
+exports.release = gulp.series(compile, bump)
