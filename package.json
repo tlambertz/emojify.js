@@ -50,7 +50,6 @@
     "jstest": "~1.0.4",
     "minimatch": "~1.0.0",
     "q": "^1.0.1",
-    "sprity": "1.0.8",
     "through2": "~0.6.3",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"

@@ -1,11 +1,8 @@
 const gulp = require('gulp'),
     $ = require('gulp-load-plugins')(),
     path = require('path'),
-    minimatch = require('minimatch'),
-    through2 = require('through2'),
     del      = require('del'),
     inquirer = require('inquirer');
-    // sprite = require('css-sprite').stream,
     ts = require('gulp-typescript'),
     tsProject = ts.createProject('tsconfig.json');
 
@@ -30,18 +27,6 @@ const paths = {
         }
     }
 }
-exports.default = compile
-
-function compile () {
-    return gulp.series(scripts, imageAndStyles)
-}
-exports.compile = compile
-
-function release () {
-    return gulp.series(update, compile, bump)
-}
-exports.release = release
-
 function scripts () {
     const pkg = require('./package.json');
     return tsProject.src()
@@ -61,6 +46,7 @@ function scripts () {
         .pipe($.rename({
             suffix: '.min'
         }))
+        // .pipe($.replace(/(\/\*##EMOJILIST\*\/).+$/m, '$1"' + emoji.substr(1) + '";'))
         .pipe(gulp.dest(paths.dist.scripts));
 }
 exports.scripts = scripts
@@ -81,70 +67,11 @@ var getEmoticonFilter = function(){
     })
 };
 
-function imageAndStyles () {
-    return gulp.series(copyStyles, dataURI, function () {
-        var emoticonFilter = getEmoticonFilter(),
-        cssFilter = $.filter('**.css'),
-        emoticonCssFilter = $.filter('**.css'),
-        emoticonPngFilter = $.filter('**.png');
-
-    return gulp.src('./src/images/emoji/*.png')
-
-        // copy images over as they are
-
+var imageAndStyles = gulp.series(copyStyles, dataURI, function () {
+    return gulp.src('./v2/images/emoji/*.png')
         .pipe(gulp.dest(paths.dist.images.separate))
+})
 
-        // generate emoticon sprites
-
-        .pipe(emoticonFilter)
-        .pipe(sprite({
-            name: 'emojify-emoticons',
-            style: 'emojify-emoticons.css',
-            prefix: 'emoji',
-            cssPath: '../../images/sprites/',
-            orientation: 'binary-tree',
-            retina: true,
-            template: './build/sprites.mustache'
-        }))
-        .pipe(emoticonCssFilter)
-        .pipe($.replace('.emoji-+1', '.emoji-plus1'))
-        .pipe(gulp.dest(paths.dist.styles.sprites))
-        .pipe($.minifyCss())
-        .pipe($.rename({
-            suffix: '.min'
-        }))
-        .pipe(gulp.dest(paths.dist.styles.sprites))
-        .pipe(emoticonCssFilter.restore())
-        .pipe(emoticonPngFilter)
-        .pipe(gulp.dest(paths.dist.images.sprites))
-        .pipe(emoticonPngFilter.restore())
-        .pipe($.filter('!**sprites**')) //exclude generated spritesheets
-        .pipe(emoticonFilter.restore())
-
-        // generate all sprites
-
-        .pipe(sprite({
-            name: 'emojify',
-            style: 'emojify.css',
-            prefix: 'emoji',
-            cssPath: '../../images/sprites/',
-            orientation: 'binary-tree',
-            retina: true,
-            template: './build/sprites.mustache'
-        }))
-        .pipe(cssFilter)
-        .pipe($.replace('.emoji-+1', '.emoji-plus1'))
-        .pipe(gulp.dest(paths.dist.styles.sprites))
-        .pipe($.minifyCss())
-        .pipe($.rename({
-             suffix: '.min'
-        }))
-        .pipe(gulp.dest(paths.dist.styles.sprites))
-        .pipe(cssFilter.restore())
-        .pipe($.filter('**.png'))
-        .pipe(gulp.dest(paths.dist.images.sprites));
-    })
-}
 exports.imageAndStyles = imageAndStyles
 
 function dataURI () {
@@ -178,9 +105,10 @@ function dataURI () {
         }))
         .pipe(gulp.dest(paths.dist.styles.dataURI));
 }
+exports.dataURI = dataURI
 
 function copyStyles (){
-    gulp.src('./src/css/basic/*.css')
+    return gulp.src('./src/css/basic/*.css')
         .pipe(gulp.dest(paths.dist.styles.basic))
         .pipe($.minifyCss())
         .pipe($.rename({
@@ -188,6 +116,7 @@ function copyStyles (){
         }))
         .pipe(gulp.dest(paths.dist.styles.basic));
 }
+exports.copyStyles = copyStyles
 
 function clean (done) {
     del(paths.dist.root, done);
@@ -216,11 +145,11 @@ function bump (done) {
 exports.bump = bump
 
 function update () {
+    // TODO: this should be bundled in build stage
     const emojiPath = `./v2/images/emoji`
     del(emojiPath);
 
-    const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => ({
-        ...acc,
+    const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => Object.assign(acc, {
         [emoji.image]: emoji
     }), {})
     const availableFiles = Object.keys(emojiMap)
@@ -236,3 +165,8 @@ function update () {
         .pipe(gulp.dest(emojiPath))
 }
 exports.update = update
+
+const compile = gulp.series(scripts, imageAndStyles)
+exports.default = compile
+exports.compile = compile
+exports.release = gulp.series(update, compile, bump)
