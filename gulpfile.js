@@ -215,27 +215,24 @@ function bump (done) {
 }
 exports.bump = bump
 
-function update (done) {
-    var emoji = '';
+function update () {
+    const emojiPath = `./v2/images/emoji`
+    del(emojiPath);
 
-    del('./src/images/emoji');
+    const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => ({
+        ...acc,
+        [emoji.image]: emoji
+    }), {})
+    const availableFiles = Object.keys(emojiMap)
 
-    $.download('https://github.com/arvida/emoji-cheat-sheet.com/archive/master.zip')
-        .pipe($.unzip())
-        .pipe($.filter(function(file){
-            return minimatch(file.path, '**/public/graphics/emojis/*.png');
+    return gulp.src('node_modules/emoji-datasource-apple/img/apple/64/*.png')
+        .pipe($.filter(file => availableFiles.includes(file.basename)))
+        .pipe($.rename(file => {
+            const emojiData = emojiMap[`${file.basename}${file.extname}`]
+
+            file.basename = emojiData.short_name
+            file.dirname = './'
         }))
-        .pipe($.rename({ dirname: './' }))
-        .pipe(gulp.dest('./src/images/emoji'))
-        .pipe(through2({ objectMode: true }, function(file, enc, cb){
-            emoji += ',' + path.basename(file.path, path.extname(file.path));
-            this.push(file);
-            cb();
-        }, function(){
-            gulp.src('./src/emojify.js')
-                .pipe($.replace(/(\/\*##EMOJILIST\*\/).+$/m, '$1"' + emoji.substr(1) + '";'))
-                .pipe(gulp.dest('./src'))
-                .on('end', done);
-        }));
+        .pipe(gulp.dest(emojiPath))
 }
 exports.update = update
