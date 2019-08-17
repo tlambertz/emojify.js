@@ -185,6 +185,11 @@ function bump (done) {
 }
 exports.bump = bump
 
+function watch () {
+    return gulp.watch('v2/**/*.{ts,js}', scripts)
+}
+exports.watch = watch
+
 const compile = gulp.series(imageAndStyles, scripts)
 exports.default = compile
 exports.compile = compile
