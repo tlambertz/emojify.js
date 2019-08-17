@@ -37,7 +37,7 @@
     "gulp-rename": "~1.2.0",
     "gulp-replace": "~0.5.0",
     "gulp-typescript": "^5.0.1",
-    "gulp-uglify": "~1.0.1",
+    "gulp-uglify": "^3.0.2",
     "gulp-unzip": "~0.1.2",
     "inquirer": "~0.8.0",
     "jsdom": "^15.1.1",

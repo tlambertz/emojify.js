@@ -5,7 +5,7 @@ interface Window {
   document: typeof document
 }
 
-const namedEmojiString = '';
+const namedEmojiString = /*##EMOJILIST*/'';
 const namedEmoji = namedEmojiString.split(/,/);
 const namedMatchHash: { [key: string]: boolean } = namedEmoji.reduce(
   (memo, v) => ({

@@ -54,7 +54,9 @@ function scripts () {
             ' * Copyright (c) Hassan Khan ' + new Date().getFullYear() + '\n' +
             ' */'))
         .pipe($.uglify({
-            preserveComments: 'some'
+            output: {
+                comments: /##EMOJILIST/
+            }
         }))
         .pipe($.rename({
             suffix: '.min'
