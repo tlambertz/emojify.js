@@ -39,6 +39,9 @@ const emoticons = {
   /* :+1: */ thumbsup: /:\+1:/g,
   /* :-1: */ thumbsdown: /:\-1:/g,
 };
+const ignoreModeAvailableKeys = [
+  'named', 'thumbsup', 'thumbsdown'
+]
 const emoticonsProcessed: [RegExp, string][] = Object.entries(emoticons).map(
   ([key, value]) => [value, key],
 );
@@ -74,23 +77,6 @@ function isWhitespace(s: string) {
   );
 }
 
-/* Given an regex match, return the name of the matching emoji */
-function getEmojiNameForMatch(match: RegExpMatchArray) {
-  /* Special case for named emoji */
-  if (match[1] && match[2]) {
-    var named = match[2];
-    if (namedMatchHash[named]) {
-      return named;
-    }
-    return;
-  }
-  for (var i = 3; i < match.length - 1; i++) {
-    if (match[i]) {
-      return emoticonsProcessed[i - 2][1];
-    }
-  }
-}
-
 type EmojifyConfig = {
   blacklist?: {
     ids: string[];
@@ -103,58 +89,6 @@ type EmojifyConfig = {
   ignore_emoticons?: boolean;
   mode?: keyof modeToElementTag;
 };
-
-class Validator {
-  lastEmojiTerminatedAt = -1;
-
-  validate(match: RegExpMatchArray, index: number, input: string) {
-    var self = this;
-
-    /* Validator */
-    var emojiName = getEmojiNameForMatch(match);
-    if (!emojiName) {
-      return;
-    }
-
-    var m = match[0];
-    var length = m.length;
-    // var index = match.index;
-    // var input = match.input;
-
-    function success() {
-      self.lastEmojiTerminatedAt = length + index;
-      return emojiName;
-    }
-
-    /* At the beginning? */
-    if (index === 0) {
-      return success();
-    }
-
-    /* At the end? */
-    if (input.length === m.length + index) {
-      return success();
-    }
-
-    var hasEmojiBefore = this.lastEmojiTerminatedAt === index;
-    if (hasEmojiBefore) {
-      return success();
-    }
-
-    /* Has a whitespace before? */
-    if (isWhitespace(input.charAt(index - 1))) {
-      return success();
-    }
-
-    var hasWhitespaceAfter = isWhitespace(input.charAt(m.length + index));
-    /* Has a whitespace after? */
-    if (hasWhitespaceAfter && hasEmojiBefore) {
-      return success();
-    }
-
-    return;
-  }
-}
 
 class Emojify {
   emojiMegaRe?: RegExp;
@@ -174,9 +108,75 @@ class Emojify {
 
   config: EmojifyConfig = {};
 
+  Validator: any
+
+  constructor () {
+    const Emojifyself = this
+
+    this.Validator = class {
+      lastEmojiTerminatedAt = -1;
+    
+      validate(match: RegExpMatchArray, index: number, input: string) {
+        var self = this;
+    
+        /* Validator */
+        var emojiName = Emojifyself.getEmojiNameForMatch(match);
+        if (!emojiName) {
+          return;
+        }
+    
+        var m = match[0];
+        var length = m.length;
+        // var index = match.index;
+        // var input = match.input;
+    
+        function success() {
+          self.lastEmojiTerminatedAt = length + index;
+          return emojiName;
+        }
+    
+        /* At the beginning? */
+        if (index === 0) {
+          return success();
+        }
+    
+        /* At the end? */
+        if (input.length === m.length + index) {
+          return success();
+        }
+    
+        var hasEmojiBefore = this.lastEmojiTerminatedAt === index;
+        if (hasEmojiBefore) {
+          return success();
+        }
+    
+        /* Has a whitespace before? */
+        if (isWhitespace(input.charAt(index - 1))) {
+          return success();
+        }
+    
+        var hasWhitespaceAfter = isWhitespace(input.charAt(m.length + index));
+        /* Has a whitespace after? */
+        if (hasWhitespaceAfter && hasEmojiBefore) {
+          return success();
+        }
+    
+        return;
+      }
+    }
+  }
+
+  get emoticonsProcessed () {
+    if (this.defaultConfig.ignore_emoticons) {
+      return emoticonsProcessed.filter(([,k]) => ignoreModeAvailableKeys.includes(k))
+    } else {
+      return emoticonsProcessed
+    }
+  }
+
   initMegaRe() {
     /* The source for our mega-regex */
-    const mega = emoticonsProcessed
+    const mega = this.emoticonsProcessed
       .map(function(v) {
         var re = v[0];
         var val = re.source || re;
@@ -189,6 +189,23 @@ class Emojify {
     return new RegExp(mega, 'gi');
   }
 
+  /* Given an regex match, return the name of the matching emoji */
+  getEmojiNameForMatch = (match: RegExpMatchArray) => {
+    /* Special case for named emoji */
+    if (match[1] && match[2]) {
+      var named = match[2];
+      if (namedMatchHash[named]) {
+        return named;
+      }
+      return;
+    }
+    for (var i = 3; i < match.length - 1; i++) {
+      if (match[i]) {
+        return this.emoticonsProcessed[i - 2][1];
+      }
+    }
+  }
+
   emojifyString = (htmlString: string, replacer: Function) => {
     if (!htmlString) {
       return htmlString;
@@ -199,7 +216,7 @@ class Emojify {
 
     this.emojiMegaRe = this.initMegaRe();
 
-    var validator = new Validator();
+    var validator = new this.Validator();
 
     return htmlString.replace(this.emojiMegaRe, (...args) => {
       var matches = Array.prototype.slice.call(args, 0, -2);
@@ -308,7 +325,8 @@ class Emojify {
     const matchAndInsertEmoji = (node: Text) => {
       var match;
       var matches = [];
-      var validator = new Validator();
+
+      var validator = new this.Validator();
 
       while ((match = this.emojiMegaRe!.exec(node.data)) !== null) {
         if (validator.validate(match, match.index, match.input)) {
@@ -318,7 +336,7 @@ class Emojify {
 
       for (var i = matches.length; i-- > 0; ) {
         /* Replace the text with the emoji */
-        var emojiName = getEmojiNameForMatch(matches[i])!;
+        var emojiName = this.getEmojiNameForMatch(matches[i])!;
         this.insertEmojicon({
           node: node,
           match: matches[i],
@@ -328,6 +346,8 @@ class Emojify {
         });
       }
     };
+
+    this.emojiMegaRe = this.initMegaRe();
 
     var nodes = [];
 
