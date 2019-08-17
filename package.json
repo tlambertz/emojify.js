@@ -4,8 +4,8 @@
   "description": "A Javascript module to convert emoji keywords to images.",
   "main": "dist/js/index.min.js",
   "scripts": {
-    "test": "phantomjs tests/phantom.js && node tests/node",
-    "watch": "tsc --watch"
+    "test": "node tests/node",
+    "build": "gulp"
   },
   "types": "dist/index.d.ts",
   "repository": {
