@@ -67,9 +67,8 @@ var getEmoticonFilter = function(){
     })
 };
 
-const imageAndStyles = gulp.series(copyStyles, dataURI, function () {
-    const emojiPath = paths.dist.images.separate
-    del(emojiPath);
+function copyImages () {
+    del(paths.dist.images.separate);
 
     const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => Object.assign(acc, {
         [emoji.image]: emoji
@@ -84,15 +83,17 @@ const imageAndStyles = gulp.series(copyStyles, dataURI, function () {
             file.basename = emojiData.short_name
             file.dirname = './'
         }))
-        .pipe(gulp.dest(emojiPath))
-})
+        .pipe(gulp.dest(paths.dist.images.separate))
+}
+exports.copyImages = copyImages
 
+const imageAndStyles = gulp.series(copyImages, copyStyles, dataURI)
 exports.imageAndStyles = imageAndStyles
 
 function dataURI () {
     const emoticonFilter = getEmoticonFilter();
 
-    return gulp.src('./src/images/emoji/*.png')
+    return gulp.src(`${paths.dist.images.separate}/*.png`)
         .pipe($.imageDataUri({
             customClass: function(className){
                 return 'emoji-' + className
