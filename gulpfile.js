@@ -1,40 +1,55 @@
-var gulp = require('gulp'),
+const gulp = require('gulp'),
     $ = require('gulp-load-plugins')(),
     path = require('path'),
     minimatch = require('minimatch'),
     through2 = require('through2'),
     del      = require('del'),
-    inquirer = require('inquirer'),
-    sprite = require('css-sprite').stream;
+    inquirer = require('inquirer');
+    // sprite = require('css-sprite').stream,
+    ts = require('gulp-typescript'),
+    tsProject = ts.createProject('tsconfig.json');
 
-
-var paths = {
+const distRoot = path.resolve('./distv2')
+const scriptRoot = path.join(distRoot, 'js')
+const styleRoot = path.join(distRoot, 'css')
+const imageRoot = path.join(distRoot, 'image')
+const paths = {
     dist: {
-        root: './dist'
+        root: distRoot,
+        scripts: scriptRoot,
+        styles: {
+            root: styleRoot,
+            dataURI: path.join(styleRoot, 'data-uri'),
+            sprites: path.join(styleRoot, 'sprites'),
+            basic: path.join(styleRoot, 'basic')
+        },
+        images: {
+            root: imageRoot,
+            separate: path.join(imageRoot, 'basic'),
+            sprites: path.join(imageRoot, 'sprites')
+        }
     }
-};
-paths.dist.scripts = path.join(paths.dist.root, 'js');
-paths.dist.styles = { root: path.join(paths.dist.root, 'css') };
-paths.dist.styles.dataURI = path.join(paths.dist.styles.root, 'data-uri');
-paths.dist.styles.sprites = path.join(paths.dist.styles.root, 'sprites');
-paths.dist.styles.basic = path.join(paths.dist.styles.root, 'basic');
-paths.dist.images = { root: path.join(paths.dist.root, 'images') };
-paths.dist.images.separate = path.join(paths.dist.images.root, 'basic');
-paths.dist.images.sprites = path.join(paths.dist.images.root, 'sprites');
+}
+exports.default = compile
 
-gulp.task('default', ['compile']);
+function compile () {
+    return gulp.series(scripts, imageAndStyles)
+}
+exports.compile = compile
 
-gulp.task('compile', ['script', 'images-and-styles']);
+function release () {
+    return gulp.series(update, compile, bump)
+}
+exports.release = release
 
-gulp.task('release', ['update', 'compile', 'bump']);
-
-gulp.task('script', function(){
-    var pkg = require('./package.json');
-
-    gulp.src('./src/emojify.js')
-        .pipe(gulp.dest(paths.dist.scripts))
-        .pipe($.jshint())
-        .pipe($.jshint.reporter('jshint-stylish'))
+function scripts () {
+    const pkg = require('./package.json');
+    return tsProject.src()
+        .pipe(tsProject())
+        .js
+        // TODO: Do tslint
+        // .pipe($.jshint())
+        // .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.insert.prepend('/*! ' + pkg.name + ' - v' + pkg.version + ' - \n' +
             ' * Copyright (c) Hassan Khan ' + new Date().getFullYear() + '\n' +
             ' */'))
@@ -45,7 +60,8 @@ gulp.task('script', function(){
             suffix: '.min'
         }))
         .pipe(gulp.dest(paths.dist.scripts));
-});
+}
+exports.scripts = scripts
 
 var getEmoticonFilter = function(){
     var emoticons = [
@@ -63,10 +79,9 @@ var getEmoticonFilter = function(){
     })
 };
 
-gulp.task('images-and-styles', ['copy-styles', 'data-uri'], function(){
-
-
-    var emoticonFilter = getEmoticonFilter(),
+function imageAndStyles () {
+    return gulp.series(copyStyles, dataURI, function () {
+        var emoticonFilter = getEmoticonFilter(),
         cssFilter = $.filter('**.css'),
         emoticonCssFilter = $.filter('**.css'),
         emoticonPngFilter = $.filter('**.png');
@@ -126,9 +141,11 @@ gulp.task('images-and-styles', ['copy-styles', 'data-uri'], function(){
         .pipe(cssFilter.restore())
         .pipe($.filter('**.png'))
         .pipe(gulp.dest(paths.dist.images.sprites));
-});
+    })
+}
+exports.imageAndStyles = imageAndStyles
 
-gulp.task('data-uri', function(){
+function dataURI () {
     var emoticonFilter = getEmoticonFilter();
 
     return gulp.src('./src/images/emoji/*.png')
@@ -158,9 +175,9 @@ gulp.task('data-uri', function(){
             suffix: '.min'
         }))
         .pipe(gulp.dest(paths.dist.styles.dataURI));
-});
+}
 
-gulp.task('copy-styles', function(){
+function copyStyles (){
     gulp.src('./src/css/basic/*.css')
         .pipe(gulp.dest(paths.dist.styles.basic))
         .pipe($.minifyCss())
@@ -168,14 +185,15 @@ gulp.task('copy-styles', function(){
             suffix: '.min'
         }))
         .pipe(gulp.dest(paths.dist.styles.basic));
-});
+}
 
-gulp.task('clean', function(done){
+function clean (done) {
     del(paths.dist.root, done);
-});
+}
+exports.clean = clean
 
 
-gulp.task('bump', function(done){
+function bump (done) {
     inquirer.prompt({
         type: 'list',
         name: 'bump',
@@ -192,9 +210,10 @@ gulp.task('bump', function(done){
             .pipe(gulp.dest('./'))
             .on('end', done);
     });
-});
+}
+exports.bump = bump
 
-gulp.task('update', function(done){
+function update (done) {
     var emoji = '';
 
     del('./src/images/emoji');
@@ -216,4 +235,5 @@ gulp.task('update', function(done){
                 .pipe(gulp.dest('./src'))
                 .on('end', done);
         }));
-});
+}
+exports.update = update
