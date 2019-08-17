@@ -8,4 +8,4 @@ tests.browserified.js
 *.iml
 *.sublime-project
 
-distv2
+dist

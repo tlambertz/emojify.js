@@ -1,25 +1,26 @@
 {
   "name": "emojify.js",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "A Javascript module to convert emoji keywords to images.",
-  "main": "dist/js/emojify.js",
+  "main": "dist/js/index.min.js",
   "scripts": {
     "test": "phantomjs tests/phantom.js && node tests/node",
     "watch": "tsc --watch"
   },
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://hassankhan@github.com/hassankhan/emojify.js.git"
+    "url": "https://github.com/Yukaii/emojify.js.git"
   },
   "keywords": [
     "emoji",
     "emojify",
     "javascript"
   ],
-  "author": "Hassan Khan",
+  "author": "Yukai Huang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hassankhan/emojify.js/issues"
+    "url": "https://github.com/Yukaii/emojify.js/issues"
   },
   "devDependencies": {
     "del": "~0.1.3",

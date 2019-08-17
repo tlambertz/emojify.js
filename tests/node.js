@@ -1,7 +1,7 @@
 require('jsdom-global')()
 
 global.JS = require('jstest');
-global.emojify = require('../distv2/js/index.min');
+global.emojify = require('../dist/js/index.min');
 
 require('./spec/dom');
 require('./spec/tag_type');

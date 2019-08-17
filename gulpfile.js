@@ -8,7 +8,7 @@ const gulp = require('gulp'),
     ts = require('gulp-typescript'),
     tsProject = ts.createProject('tsconfig.json');
 
-const distRoot = path.resolve('./distv2')
+const distRoot = path.resolve('./dist')
 const scriptRoot = path.join(distRoot, 'js')
 const styleRoot = path.join(distRoot, 'css')
 const imageRoot = path.join(distRoot, 'image')
@@ -186,7 +186,7 @@ function bump (done) {
 exports.bump = bump
 
 function watch () {
-    return gulp.watch('v2/**/*.{ts,js}', scripts)
+    return gulp.watch('src/**/*.{ts,js}', scripts)
 }
 exports.watch = watch
 

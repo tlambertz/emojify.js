@@ -7,8 +7,8 @@
       "dom",
       "es2017"
     ],
-    "rootDir": "v2",
-    "outDir": "distv2",
+    "rootDir": "src",
+    "outDir": "dist",
     "declaration": true
   }
 }
