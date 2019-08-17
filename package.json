@@ -44,6 +44,7 @@
     "jsdom-global": "^3.0.2",
     "jshint-stylish": "~1.0.0",
     "jstest": "~1.0.4",
+    "merge2": "^1.2.4",
     "minimatch": "~1.0.0",
     "q": "^1.0.1",
     "through2": "~0.6.3",

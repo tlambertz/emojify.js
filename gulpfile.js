@@ -3,7 +3,8 @@ const gulp = require('gulp'),
     $ = require('gulp-load-plugins')(),
     path = require('path'),
     del      = require('del'),
-    inquirer = require('inquirer');
+    inquirer = require('inquirer'),
+    merge = require('merge2'),
     ts = require('gulp-typescript'),
     tsProject = ts.createProject('tsconfig.json');
 
@@ -47,25 +48,31 @@ async function scripts () {
         return path.basename(file, path.extname(file));
     }).join(',')
 
-    return tsProject.src()
-        .pipe(tsProject())
-        .js
-        // TODO: Do tslint
-        // .pipe($.jshint())
-        // .pipe($.jshint.reporter('jshint-stylish'))
-        .pipe($.insert.prepend('/*! ' + pkg.name + ' - v' + pkg.version + ' - \n' +
-            ' * Copyright (c) Hassan Khan ' + new Date().getFullYear() + '\n' +
-            ' */'))
-        .pipe($.uglify({
-            output: {
-                comments: /##EMOJILIST/
-            }
-        }))
-        .pipe($.rename({
-            suffix: '.min'
-        }))
-        .pipe($.replace(/(\/\*##EMOJILIST\*\/.+?),/,  `/*##EMOJILIST*/"${emojiString}",`))
-        .pipe(gulp.dest(paths.dist.scripts));
+    const tsResult = tsProject.src().pipe(tsProject())
+
+    return merge([
+        tsResult
+            .js
+            // TODO: Do tslint
+            // .pipe($.jshint())
+            // .pipe($.jshint.reporter('jshint-stylish'))
+            .pipe($.insert.prepend(`/*! ${pkg.name} - v${pkg.version} -
+* Copyright (c) Yukai Huang ${new Date().getFullYear()}
+*/`))
+            .pipe($.uglify({
+                output: {
+                    comments: /##EMOJILIST/
+                }
+            }))
+            .pipe($.rename({
+                suffix: '.min'
+            }))
+            .pipe($.replace(/(\/\*##EMOJILIST\*\/.+?),/,  `/*##EMOJILIST*/"${emojiString}",`))
+            .pipe(gulp.dest(paths.dist.scripts)),
+        tsResult
+            .dts
+            .pipe(gulp.dest(paths.dist.root))
+    ])
 }
 exports.scripts = scripts
 

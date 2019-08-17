@@ -8,6 +8,7 @@
       "es2017"
     ],
     "rootDir": "v2",
-    "outDir": "distv2"
+    "outDir": "distv2",
+    "declaration": true
   }
 }
