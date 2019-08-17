@@ -1,4 +1,5 @@
 const gulp = require('gulp'),
+    glob = require('glob'),
     $ = require('gulp-load-plugins')(),
     path = require('path'),
     del      = require('del'),
@@ -27,8 +28,25 @@ const paths = {
         }
     }
 }
-function scripts () {
+
+
+const globPromise = pattern => new Promise((resolve, reject) => {
+    glob(pattern, {}, function (err, files) {
+        if (err) {
+            reject(err)
+        } else {
+            resolve(files)
+        }
+    })
+})
+
+async function scripts () {
     const pkg = require('./package.json');
+
+    const emojiString = (await globPromise(`${paths.dist.images.separate}/*.png`)).map(file => {
+        return path.basename(file, path.extname(file));
+    }).join(',')
+
     return tsProject.src()
         .pipe(tsProject())
         .js
@@ -46,7 +64,7 @@ function scripts () {
         .pipe($.rename({
             suffix: '.min'
         }))
-        // .pipe($.replace(/(\/\*##EMOJILIST\*\/).+$/m, '$1"' + emoji.substr(1) + '";'))
+        .pipe($.replace(/(\/\*##EMOJILIST\*\/.+?),/,  `/*##EMOJILIST*/"${emojiString}",`))
         .pipe(gulp.dest(paths.dist.scripts));
 }
 exports.scripts = scripts
