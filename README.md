@@ -1,30 +1,12 @@
 # emojify.js
 
-[![Maintenance](https://img.shields.io/maintenance/no/red.svg)]()
-
-[![npm version][ico-npm]][package-npm]
-[![Bower version][ico-bower]][package-bower]
-[![MIT Licensed][ico-license]][license]
-[![Gitter chat][ico-gitter]][gitter]
+Note: This is fork rewrite version of emojify.js with TypeScript and up-to-date dependencies.
 
 ---
-
-> This project is currently unmaintained.
-
----
-
-Master | Develop
---- | ---
-[![Master branch build status][ico-build]][travis] | [![Develop branch build status][ico-build-dev]][travis]
-[![Master branch Windows build status][ico-windows-build]][appveyor] | [![Develop branch Windows build status][ico-windows-build-dev]][appveyor]
-
-[![Browser Results](https://ci.testling.com/hassankhan/emojify.js.png)](https://ci.testling.com/hassankhan/emojify.js)
 
 A swiss-army-knife for all emoji, in Javascript. Used by [Gitter](https://gitter.im/) and [Mapbox](https://www.mapbox.com/blog/emoji-map-markers/).
 
 The emoji keywords are as described by [emoji-cheat-sheet.com](http://www.emoji-cheat-sheet.com).
-
-Go to this project's [GitHub pages](http://hassankhan.github.com/emojify.js) to see the code in action.
 
 ## Features
 
@@ -40,27 +22,9 @@ Go to this project's [GitHub pages](http://hassankhan.github.com/emojify.js) to 
 
 ## Installation
 
-Care about old browsers compatibility? Use https://github.com/es-shims/es5-shim
-
-### Via cdnjs
-
-emojify.js is now available on cdnjs - https://cdnjs.com/libraries/emojify.js
-
-Add this to the rest of your stylesheet imports:
-
-`<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/emojify.js/1.1.0/css/basic/emojify.min.css" />`
-
-Then add this to your Javascript code:
-
-`<script src="//cdnjs.cloudflare.com/ajax/libs/emojify.js/1.1.0/js/emojify.min.js"></script>`
-
-### Via Bower
-
-`bower install emojify.js --save`
-
 ### Via npm
 
-`npm install emojify.js  --save`
+`npm install @yukaii/emojify.js  --save`
 
 ## API
 
@@ -97,8 +61,8 @@ emojify.setConfig({tag_type : 'div'});
 - `element` - Optional HTML element to restrict the emojification to.
 - `replacer` - Optional Function to override emoji replacement behaviour with your own. The function will receive two arguments, the emoji pattern found (`emoji`), and the emoji name (`name`). In the case of emoticons, for example, `emoji = ':)'` and `name = 'smile'`. Your function must return a HTMLElement.
 
-
 ##### Browser
+
 ```js
 emojify.run();
 // OR
@@ -113,6 +77,7 @@ emojify.run(null, function(emoji, emojiName){
 ```
 
 ##### Node.js
+
 Requires you to have jsdom installed:
 `npm i jsdom --save`
 
@@ -126,6 +91,7 @@ jsdom.env({
     }
 });
 ```
+
 ---
 
 ### replace(string, [callback])
@@ -133,6 +99,7 @@ jsdom.env({
 *This works in the browser and on Node*
 
 #### Parameters
+
 - `string` - String to emojify
 - `callback` - Optional callback function to output emoji with
 
@@ -163,6 +130,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md).
 
 - [All Contributors](https://github.com/hassankhan/emojify.js/contributors)
 - [Hassan Khan](https://github.com/hassankhan)
+- [Yukai Huang](https://github.com/Yukaii)
 
 ## License
 
