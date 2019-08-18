@@ -6,6 +6,7 @@ const gulp = require('gulp'),
     inquirer = require('inquirer'),
     merge = require('merge2'),
     ts = require('gulp-typescript'),
+    webpack = require('webpack-stream'),
     tsProject = ts.createProject('tsconfig.json');
 
 const distRoot = path.resolve('./dist')
@@ -51,23 +52,25 @@ async function scripts () {
     const tsResult = tsProject.src().pipe(tsProject())
 
     return merge([
-        tsResult
-            .js
+        gulp.src('./src/index.ts')
+            .pipe(webpack({
+                config : require('./webpack.config.js')
+            }))
             // TODO: Do tslint
             // .pipe($.jshint())
             // .pipe($.jshint.reporter('jshint-stylish'))
             .pipe($.insert.prepend(`/*! ${pkg.name} - v${pkg.version} -
 * Copyright (c) Yukai Huang ${new Date().getFullYear()}
 */`))
+            .pipe($.rename({
+                suffix: '.min'
+            }))
+            .pipe($.replace(/\/\*##EMOJILIST\*\/\n'';/,  `/*##EMOJILIST*/'${emojiString}';`))
             .pipe($.uglify({
                 output: {
                     comments: /##EMOJILIST/
                 }
             }))
-            .pipe($.rename({
-                suffix: '.min'
-            }))
-            .pipe($.replace(/(\/\*##EMOJILIST\*\/.+?),/,  `/*##EMOJILIST*/"${emojiString}",`))
             .pipe(gulp.dest(paths.dist.scripts)),
         tsResult
             .dts
