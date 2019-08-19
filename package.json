@@ -1,6 +1,6 @@
 {
   "name": "@yukaii/emojify.js",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "A Javascript module to convert emoji keywords to images.",
   "main": "dist/js/index.min.js",
   "browser": "dist/js/emojify-browser.min.js",
