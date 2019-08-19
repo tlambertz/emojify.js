@@ -7,12 +7,13 @@ const gulp = require('gulp'),
     merge = require('merge2'),
     ts = require('gulp-typescript'),
     webpack = require('webpack-stream'),
+    fs = require('fs'),
     tsProject = ts.createProject('tsconfig.json');
 
 const distRoot = path.resolve('./dist')
 const scriptRoot = path.join(distRoot, 'js')
 const styleRoot = path.join(distRoot, 'css')
-const imageRoot = path.join(distRoot, 'image')
+const imageRoot = path.join(distRoot, 'images')
 const paths = {
     dist: {
         root: distRoot,
@@ -95,7 +96,7 @@ var getEmoticonFilter = function(){
     })
 };
 
-function copyImages () {
+async function copyImages () {
     del(paths.dist.images.separate);
 
     const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => Object.assign(acc, {
@@ -103,7 +104,7 @@ function copyImages () {
     }), {})
     const availableFiles = Object.keys(emojiMap)
 
-    return gulp.src('node_modules/emoji-datasource-apple/img/apple/64/*.png')
+    let pipeline = gulp.src(`node_modules/emoji-datasource-apple/img/apple/64/*.png`)
         .pipe($.filter(file => availableFiles.includes(file.basename)))
         .pipe($.rename(file => {
             const emojiData = emojiMap[`${file.basename}${file.extname}`]
@@ -112,6 +113,26 @@ function copyImages () {
             file.dirname = './'
         }))
         .pipe(gulp.dest(paths.dist.images.separate))
+
+    const extractPipelines = availableFiles.reduce((ps, basename) => {
+        const emoji = emojiMap[basename]
+        const filteredShortNames = emoji.short_names.filter(n => n !== emoji.short_name)
+        const sourceFile = `${emojiDataSourcePath}/${basename}`
+
+        if (filteredShortNames.length > 0 && fs.existsSync(sourceFile)) {
+            const pipelines = filteredShortNames.map(shortname => {
+                return gulp.src(sourceFile)
+                    .pipe($.clone())
+                    .pipe($.rename(`${shortname}.png`))
+                    .pipe(gulp.dest(paths.dist.images.separate))
+            })
+            return ps.concat(pipelines)
+        } else {
+            return ps
+        }
+    }, [])
+
+    return merge(pipeline, ...extractPipelines)
 }
 exports.copyImages = copyImages
 
