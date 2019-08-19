@@ -104,7 +104,8 @@ async function copyImages () {
     }), {})
     const availableFiles = Object.keys(emojiMap)
 
-    let pipeline = gulp.src(`node_modules/emoji-datasource-apple/img/apple/64/*.png`)
+    const emojiDataSourcePath = 'node_modules/emoji-datasource-apple/img/apple/64'
+    let pipeline = gulp.src(`${emojiDataSourcePath}/*.png`)
         .pipe($.filter(file => availableFiles.includes(file.basename)))
         .pipe($.rename(file => {
             const emojiData = emojiMap[`${file.basename}${file.extname}`]
