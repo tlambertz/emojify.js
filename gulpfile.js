@@ -12,7 +12,7 @@ const gulp = require('gulp'),
 const distRoot = path.resolve('./dist')
 const scriptRoot = path.join(distRoot, 'js')
 const styleRoot = path.join(distRoot, 'css')
-const imageRoot = path.join(distRoot, 'image')
+const imageRoot = path.join(distRoot, 'images')
 const paths = {
     dist: {
         root: distRoot,
