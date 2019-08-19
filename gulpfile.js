@@ -96,7 +96,7 @@ var getEmoticonFilter = function(){
     })
 };
 
-async function copyImages () {
+function copyImages () {
     del(paths.dist.images.separate);
 
     const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => Object.assign(acc, {
