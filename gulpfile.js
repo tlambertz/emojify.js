@@ -99,12 +99,12 @@ var getEmoticonFilter = function(){
 function copyImages () {
     del(paths.dist.images.separate);
 
-    const emojiMap = require('emoji-datasource-apple').reduce((acc, emoji) => Object.assign(acc, {
+    const emojiMap = require('emoji-datasource-google').reduce((acc, emoji) => Object.assign(acc, {
         [emoji.image]: emoji
     }), {})
     const availableFiles = Object.keys(emojiMap)
 
-    const emojiDataSourcePath = 'node_modules/emoji-datasource-apple/img/apple/64'
+    const emojiDataSourcePath = 'node_modules/emoji-datasource-google/img/google/64'
     let pipeline = gulp.src(`${emojiDataSourcePath}/*.png`)
         .pipe($.filter(file => availableFiles.includes(file.basename)))
         .pipe($.rename(file => {
