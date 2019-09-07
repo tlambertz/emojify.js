@@ -1,6 +1,10 @@
 # emojify.js
 
-Note: This is fork rewrite version of emojify.js with TypeScript and up-to-date dependencies.
+Note: This fork is a rewrite version from joypixels/emojify.js with TypeScript and up-to-date dependencies.
+
+Below is the original README
+
+TODO: update it
 
 ---
 
