@@ -1,6 +1,6 @@
 {
-  "name": "@yukaii/emojify.js",
-  "version": "2.0.3",
+  "name": "@hackmd/emojify.js",
+  "version": "2.1.0",
   "description": "A Javascript module to convert emoji keywords to images.",
   "main": "dist/js/index.min.js",
   "browser": "dist/js/emojify-browser.min.js",
@@ -9,22 +9,24 @@
     "test:watch": "mocha --opts tests/node.opts --watch",
     "test:browser": "karma start",
     "lint": "standard",
-    "build": "gulp"
+    "build": "gulp",
+    "clean": "gulp clean",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Yukaii/emojify.js.git"
+    "url": "https://github.com/hackmdio/emojify.js.git"
   },
   "keywords": [
     "emoji",
     "emojify",
     "javascript"
   ],
-  "author": "Yukai Huang",
+  "author": "HackMD Team",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Yukaii/emojify.js/issues"
+    "url": "https://github.com/hackmdio/emojify.js/issues"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",

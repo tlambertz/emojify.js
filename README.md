@@ -24,7 +24,7 @@ The emoji keywords are as described by [emoji-cheat-sheet.com](http://www.emoji-
 
 ### Via npm
 
-`npm install @yukaii/emojify.js  --save`
+`npm install @hackmd/emojify.js  --save`
 
 ## API
 
