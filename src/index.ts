@@ -46,23 +46,14 @@ const emoticonsProcessed: [RegExp, string][] = Object.keys(emoticons).map(
   key => [(emoticons as any)[key], key],
 );
 
-type modeToElementTag = {
+const modeToElementTag = {
   img: 'img',
   sprite: 'span',
   'data-uri': 'span',
 };
 
-const modeToElementTagType = (k: keyof modeToElementTag | undefined) => {
-  switch(k) {
-    case "img":
-      return 'img'
-    case "data-uri":
-      return 'data-uri'
-    case "sprite":
-      return 'sprite'
-    default:
-      return undefined
-  }
+const modeToElementTagType = (k: keyof typeof modeToElementTag) => {
+  return modeToElementTag[k]
 }
 
 /* Returns true if the given char is whitespace */
@@ -87,7 +78,7 @@ type EmojifyConfig = {
   only_crawl_id?: null;
   img_dir?: string;
   ignore_emoticons?: boolean;
-  mode?: keyof modeToElementTag;
+  mode?: keyof typeof modeToElementTag;
 };
 
 class Emojify {
@@ -263,7 +254,7 @@ class Emojify {
     } else {
       var elementType =
         this.defaultConfig.tag_type ||
-        modeToElementTagType(this.defaultConfig.mode);
+        modeToElementTagType(this.defaultConfig.mode!);
       emojiElement = args.win.document.createElement(elementType!);
 
       if (elementType !== 'img') {
