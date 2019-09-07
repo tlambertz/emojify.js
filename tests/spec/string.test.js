@@ -1,8 +1,5 @@
 'use strict';
 
-const { assert } = require('chai')
-const emojify = require('../../dist/js/index.min');
-
 describe('emojify used with flat strings', function() {
 
     describe('with variations of spacing around 2char smileys', function() {

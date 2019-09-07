@@ -1,7 +1,4 @@
 'use strict';
-const { assert } = require('chai')
-
-const emojify = require('../../dist/js/index.min');
 
 describe('emojify in different modes', function() {
 

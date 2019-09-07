@@ -1,8 +1,5 @@
 'use strict';
 
-const { assert } = require('chai')
-const emojify = require('../../dist/js/index.min');
-
 function assertEmoji(test, rootEl, emojiTitles) {
     var emojis = rootEl.querySelectorAll('.emoji');
     assert.equal(emojiTitles.length, emojis.length);
