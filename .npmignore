@@ -5,6 +5,8 @@
 .htaccess
 .jshintrc
 .travis.yml
+.vscode
+.github
 appveyor.yml
 index.html
 
