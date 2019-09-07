@@ -63,19 +63,6 @@
     "typescript": "^3.5.3",
     "webpack-stream": "^5.2.1"
   },
-  "testling": {
-    "html": "tests/browser/browser.html",
-    "browsers": [
-      "ie/8..latest",
-      "chrome/23..latest",
-      "firefox/22..latest",
-      "safari/latest",
-      "opera/latest",
-      "iphone/6..latest",
-      "ipad/6..latest",
-      "android-browser/latest"
-    ]
-  },
   "dependencies": {
     "@babel/runtime": "^7.5.5",
     "core-js": "^3.2.1"
