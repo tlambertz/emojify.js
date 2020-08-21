@@ -7,5 +7,3 @@ tests.browserified.js
 .idea
 *.iml
 *.sublime-project
-
-dist
